@@ -25,78 +25,48 @@ export const helloWorld = () => {
 
 export function getFolderSelect() {
   var selectedFolder = Folder.selectDialog();
-  return selectedFolder.fsName;
+  return selectedFolder.fsName ?? '';
 }
 
 export function importFileToPremiere(filePath: string) {
   var project = app.project;
   var importResult = project.importFiles([filePath], true, project.getInsertionBin(), false);
-
-  if (importResult) {
-    alert('File imported successfully!');
-  } else {
-    alert('Failed to import file.');
-  }
-  // Creating Bins
-  // var audioBin = project.rootItem.createBin("Audio");
-  // var videoBin = project.rootItem.createBin("Video");
-  // var pictureBin = project.rootItem.createBin("Picture");
-  // var otherBin = project.rootItem.createBin("Other");
-
-  // var audioFiles = [];
-  // var videoFiles = [];
-  // var pictureFiles = [];
-  // var otherFiles = [];
-
-  // for (var i = 0; i < files.length; i++) {
-  //   var file = files[i];
-  //   if (file instanceof File) {
-  //     var fsName = file.fsName;
-  //     var splitted = fsName.split(".");
-  //     splitted.reverse();
-  //     var fileExtension = splitted[0].toLowerCase();
-
-  //     switch (fileExtension) {
-  //       case "mov":
-  //         videoFiles.push(fsName);
-  //         break;
-  //       case "jpg":
-  //       case "png":
-  //         pictureFiles.push(fsName);
-  //         break;
-  //       case "mp3":
-  //         audioFiles.push(fsName);
-  //         break;
-  //       default:
-  //         otherFiles.push(fsName);
-  //     }
-  //   }
-  // }
-
-  // if (videoFiles.length > 0) {
-  //   project.importFiles(videoFiles, true, videoBin, false);
-  // }
-  // if (pictureFiles.length > 0) {
-  //   project.importFiles(pictureFiles, true, pictureBin, false);
-  // }
-  // if (audioFiles.length > 0) {
-  //   project.importFiles(audioFiles, true, audioBin, false);
-  // }
-  // if (otherFiles.length > 0) {
-  //   project.importFiles(otherFiles, true, otherBin, false);
-  // }
-
+  return importResult
 }
 
-export function exportAndUploadSequence(outputPath: string, presetPath: string) {
+export function exportAndUploadSequence(presetPath: string): any {
+  var selectedFolder = Folder.selectDialog();
+  if (!selectedFolder) {
+    throw new Error("No folder selected.");
+  }
   var sequence = app.project.activeSequence;
   if (sequence) {
-      var jobID = sequence.exportAsMediaDirect(
-          outputPath,        // Destination path for export
-          presetPath,        // Path to export preset
-          app.encoder.ENCODE_WORKAREA,
-      );
+    var firstClip = sequence.videoTracks[0].clips[0];
+    var originalExtension = "mp4"; // Default if not found
+    if (firstClip && firstClip.projectItem) {
+      var filePath = firstClip.projectItem.getMediaPath();
+      originalExtension = filePath.split('.').pop() ?? 'mp4';
+    }
+    var outPath = selectedFolder.fsName.toString() + '\\' + sequence.name.toString() + '.' + originalExtension.toString();
+
+    var outFilePath = new File(decodeURI(outPath));
+    var outPreset = new File(decodeURI(presetPath));
+
+    var res = sequence.exportAsMediaDirect(
+      outFilePath.fsName,        // Destination path for export
+      outPreset.fsName,        // Path to export preset
+      app.encoder.ENCODE_ENTIRE,
+    );
+    var result: any = { success: false, msg: '', data: null };
+    if (res === 'No Error') {
+      result.success = true;
+      result.msg = 'Success';
+      result.data = { path: outFilePath.fsName, name: sequence.name.toString() + '.' + originalExtension.toString() };
+    } else {
+      result.msg = res;
+    }
+    return result;
   } else {
-      return "No active sequence to export.";
+    throw new Error("No active sequence to export.");
   }
 }

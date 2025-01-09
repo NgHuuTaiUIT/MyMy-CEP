@@ -40,7 +40,7 @@ const config: CEP_Config = {
       name: "main",
       panelDisplayName: "MYMY Panel",
       autoVisible: true,
-      width: 1280,
+      width: 420,
       height: 720,
     },
 
@@ -59,7 +59,7 @@ const config: CEP_Config = {
     jsxBin: "off",
   },
   installModules: [],
-  copyAssets: [],
+  copyAssets: ["preset"],
   copyZipAssets: [],
 };
 export default config;

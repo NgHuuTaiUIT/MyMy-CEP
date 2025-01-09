@@ -8,10 +8,12 @@ iframe {
 .app {
     background-color: #fff;
     min-height: 100vh;
-
+    display: flex;
+    flex-direction: column;
     iframe {
         background-color: #fff;
         width: 100%;
+        flex-grow: 1;
         min-height: 90vh;
     }
 }
@@ -22,6 +24,7 @@ iframe {
     justify-content: center;
     align-items: center;
     gap: 20px;
+    border-top: 1px solid #ccc;
     button {
         display: flex;
         justify-content: center;
