@@ -1,0 +1,23 @@
+{
+    "version": "2023.07.10",
+    "url": {
+      "host": "http://localhost:3001",
+      "path": "/"
+    },
+    "token": "",
+    "preset": {
+      "render": {
+        "use_system": true,
+        "path": "preset/Match Source - Adaptive High Bitrate.epr",
+        "extension": "mp4",
+        "render_type": 1
+      },
+      "sequence": {}
+    },
+    "export": {
+      "defaultPath": ""
+    },
+    "import": {
+      "defaultPath": ""
+    }
+  }

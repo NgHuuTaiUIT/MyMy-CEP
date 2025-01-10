@@ -25,7 +25,7 @@ export const helloWorld = () => {
 
 export function getFolderSelect() {
   var selectedFolder = Folder.selectDialog();
-  return selectedFolder.fsName ?? '';
+  return selectedFolder ? selectedFolder.fsName : '';
 }
 
 export function importFileToPremiere(filePath: string) {
@@ -34,20 +34,10 @@ export function importFileToPremiere(filePath: string) {
   return importResult
 }
 
-export function exportAndUploadSequence(presetPath: string): any {
-  var selectedFolder = Folder.selectDialog();
-  if (!selectedFolder) {
-    throw new Error("No folder selected.");
-  }
+export function exportAndUploadSequence(folderPath: string, presetPath: string, extension: string, type: number): any {
   var sequence = app.project.activeSequence;
   if (sequence) {
-    var firstClip = sequence.videoTracks[0].clips[0];
-    var originalExtension = "mp4"; // Default if not found
-    if (firstClip && firstClip.projectItem) {
-      var filePath = firstClip.projectItem.getMediaPath();
-      originalExtension = filePath.split('.').pop() ?? 'mp4';
-    }
-    var outPath = selectedFolder.fsName.toString() + '\\' + sequence.name.toString() + '.' + originalExtension.toString();
+    var outPath = folderPath + '\\' + sequence.name.toString() + '.' + extension;
 
     var outFilePath = new File(decodeURI(outPath));
     var outPreset = new File(decodeURI(presetPath));
@@ -55,13 +45,13 @@ export function exportAndUploadSequence(presetPath: string): any {
     var res = sequence.exportAsMediaDirect(
       outFilePath.fsName,        // Destination path for export
       outPreset.fsName,        // Path to export preset
-      app.encoder.ENCODE_ENTIRE,
+      Number(type),
     );
     var result: any = { success: false, msg: '', data: null };
     if (res === 'No Error') {
       result.success = true;
       result.msg = 'Success';
-      result.data = { path: outFilePath.fsName, name: sequence.name.toString() + '.' + originalExtension.toString() };
+      result.data = { path: outFilePath.fsName, name: sequence.name.toString() + '.' + extension };
     } else {
       result.msg = res;
     }
