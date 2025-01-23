@@ -5,7 +5,7 @@ import { version } from "./package.json";
 const config: CEP_Config = {
   version,
   id: "com.mymy.cep",
-  displayName: "MYMY Panel 13",
+  displayName: "MYMY Panel",
   symlink: "local",
   port: 3000,
   servePort: 5000,
@@ -40,7 +40,7 @@ const config: CEP_Config = {
       name: "main",
       panelDisplayName: "MYMY Panel",
       autoVisible: true,
-      width: 420,
+      width: 1024,
       height: 720,
     },
 

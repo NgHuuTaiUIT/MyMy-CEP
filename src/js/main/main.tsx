@@ -1,10 +1,10 @@
-import { Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { os, path, fs } from "../lib/cep/node";
 import { evalTS } from "../lib/utils/bolt";
 import "./main.scss";
-import initJson from '../assets/init.config.json';
 import { createDefaultFileAndFolder, downloadFile } from "../utils";
 import { ReceiveAction, SendService } from "../actions";
+import settingConfig from '../assets/init.config.json';
 
 type ConfigType = {
   url: {
@@ -54,11 +54,6 @@ const Main = () => {
   function receiveStatusLogin(e: MessageEvent) {
     if (e.data.action === ReceiveAction.LOGINED) {
       setShowActionButtons(true);
-      // if (config) {
-      //   const newData = { ...config, token: e.data.payload.token as string }
-      //   setConfig(newData)
-      //   changeFileConfig(JSON.stringify(newData))
-      // }
     }
   }
 
@@ -127,20 +122,28 @@ const Main = () => {
     } else {
       config = await createDefaultFileAndFolder()
     }
+    console.log(config)
     setConfig(config)
   }
 
   useEffect(() => {
     if (window.cep) {
-      console.log(window.cep)
+      initConfig();
+    }else{
+      if(process.env.NODE_ENV === 'development'){
+        console.log(initConfig);
+        setConfig({...settingConfig})
+      }
     }
-    initConfig();
+  }, []);
+
+  useEffect(() => {
     window.addEventListener('message', receiveMsgFromChild);
     return () => {
       window.removeEventListener('message', receiveMsgFromChild);
     }
   }, [config]);
-
+  
   return (
     <div className="app">
       {config?.url && <iframe ref={iframeRef} onLoad={onLoad} src={config.url.host + config.url.path} frameBorder="0"></iframe>}
